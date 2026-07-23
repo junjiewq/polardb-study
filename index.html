@@ -1,339 +1,388 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="warm"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>阿里 PolarDB / PolarDB-X 完整学习册</title><style>
+<html lang="zh-CN" data-theme="warm">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿里 PolarDB / PolarDB-X 运维架构手册（详细版）</title>
+<style>
 :root{--bg:#fff7ed;--card:#fffbeb;--ink:#7c2d12;--muted:#9a3412;--accent:#ea580c;--line:#fdba74}
 *{box-sizing:border-box}
-body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(900px 500px at 10% -10%,#ffedd5,transparent 50%),radial-gradient(800px 400px at 100% 0%,#fed7aa,transparent 45%),var(--bg);color:var(--ink);line-height:1.65;font-size:15px}
-.container{max-width:980px;margin:0 auto;padding:20px 16px 60px}
-.hero{background:linear-gradient(135deg,#fb923c,#f97316 40%,#ef4444);color:#fff;border-radius:18px;padding:28px 24px;margin-bottom:18px;box-shadow:0 12px 40px rgba(234,88,12,.28)}
-.hero h1{margin:0 0 8px;font-size:26px;line-height:1.3}
-.hero p{margin:0 0 14px}
+body{margin:0;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:radial-gradient(1000px 520px at 8% -8%,#ffedd5,transparent 55%),radial-gradient(900px 480px at 100% 0%,#fed7aa,transparent 48%),var(--bg);color:var(--ink);line-height:1.7;font-size:15px}
+.container{max-width:1000px;margin:0 auto;padding:20px 16px 80px}
+.hero{background:linear-gradient(135deg,#fb923c,#f97316 42%,#ef4444);color:#fff;border-radius:18px;padding:30px 24px;margin-bottom:16px;box-shadow:0 12px 40px rgba(234,88,12,.28)}
+.hero h1{margin:0 0 10px;font-size:28px;line-height:1.28}
+.hero p{margin:0 0 12px;opacity:.96}
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .meta span{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
-.hero-btn{border:0;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;background:#fff;color:#c2410c;margin-right:8px;margin-top:6px}
+.hero-btn{border:0;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;background:#fff;color:#c2410c;margin:6px 8px 0 0}
 .hero-btn-ghost{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.55)}
 .nav,.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
-.nav a,.toc a{color:var(--muted);text-decoration:none;margin-right:8px}
+.nav a,.toc a{color:var(--muted);text-decoration:none;margin-right:10px}
 .toc h2{margin:0 0 8px;font-size:16px;color:var(--accent)}
-.toc ol{margin:0;padding-left:1.2em;columns:2;gap:18px}
-.toc li{break-inside:avoid;margin:4px 0;font-size:13px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 10px;margin:0 0 16px;box-shadow:0 6px 20px rgba(194,65,12,.06)}
-.ch-title{display:flex;gap:10px;align-items:center;margin:0 0 12px;font-size:20px;color:#9a3412}
-.ch-no{background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
-.ch-body h3{color:#c2410c;font-size:16px;margin:16px 0 8px}
-.mat{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+.toc ol{margin:0;padding-left:1.25em;columns:2;gap:22px}
+.toc li{break-inside:avoid;margin:5px 0;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px 12px;margin:0 0 16px;box-shadow:0 6px 20px rgba(194,65,12,.06)}
+.ch-title{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;font-size:21px;color:#9a3412;line-height:1.35}
+.ch-no{flex:0 0 auto;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;min-width:34px;height:34px;padding:0 8px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.ch-body h3{color:#c2410c;font-size:16.5px;margin:18px 0 8px}
+.ch-body h4{color:#b45309;font-size:15px;margin:14px 0 6px}
+.ch-body p,.ch-body li{font-size:14.5px}
+.mat{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px}
 .mat th,.mat td{border:1px solid #fdba74;padding:8px 10px;vertical-align:top}
 .mat th{background:#ffedd5;color:#9a3412;text-align:left}
-.flow{background:#431407;color:#ffedd5;padding:12px 14px;border-radius:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;white-space:pre-wrap}
+.mat .bad{background:#fee2e2;font-weight:700}
+.flow{background:#431407;color:#ffedd5;padding:12px 14px;border-radius:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;white-space:pre-wrap;margin:10px 0 14px}
 .callout{background:#fff7ed;border-left:4px solid #f59e0b;padding:10px 12px;border-radius:0 10px 10px 0;margin:12px 0}
+.warn{background:#fff1f2;border-left:4px solid #f43f5e;padding:10px 12px;border-radius:0 10px 10px 0;margin:12px 0}
 .key{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;padding:10px 12px;border-radius:10px;font-weight:700;margin:12px 0}
 .section-label{display:inline-block;margin:14px 0 8px;padding:4px 10px;border-radius:8px;color:#fff;font-size:12px;font-weight:800}
 .label-note{background:linear-gradient(135deg,#f97316,#ea580c)}
 .note-toolbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .note-toolbar button{border:1px solid #fb923c;background:#fff7ed;color:#c2410c;border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:700}
-.note-editor{min-height:88px;background:#fff;border:1.5px dashed #fb923c;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.note-editor{min-height:96px;background:#fff;border:1.5px dashed #fb923c;border-radius:10px;padding:10px 12px;margin-bottom:8px}
 .note-editor:focus{outline:none;border-style:solid;box-shadow:0 0 0 3px rgba(249,115,22,.25)}
 .note-editor:empty:before{content:attr(data-placeholder);color:#b45309;opacity:.55}
 .note-editor mark{background:#fde68a;color:#78350f;padding:0 3px;border-radius:3px}
-.foot{text-align:center;color:#c2410c;opacity:.7;font-size:12px;margin-top:20px}
-@media print{body{background:#fff}.hero-btn,.note-toolbar,.no-print{display:none!important}.flow,.hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-@media(max-width:800px){.toc ol{columns:1}}
-</style></head><body>
+.foot{text-align:center;color:#c2410c;opacity:.75;font-size:12px;margin-top:24px}
+@media print{body{background:#fff}.hero-btn,.note-toolbar,.no-print{display:none!important}.card{break-inside:avoid}.flow,.hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media(max-width:800px){.toc ol{columns:1}.hero h1{font-size:22px}}
+</style>
+</head>
+<body>
 <div class="container">
-<div class="hero">
-<h1>阿里 PolarDB / PolarDB-X<br>从入门到架构原理 · 完整学习册</h1>
-<p>通俗易懂 · 由浅入深 · 流程图 · 暖色富文本笔记 · 可导出 PDF</p>
-<div class="meta"><span>共享存储版</span><span>PolarDB-X 分布式</span><span>事务锁 HA 备份</span><span>金融运维对照</span><span>共20章</span></div>
-<button type="button" class="hero-btn" id="btn-export-pdf">导出 / 打印 PDF</button>
-<button type="button" class="hero-btn hero-btn-ghost" id="btn-export-json">导出笔记 JSON</button>
-<button type="button" class="hero-btn hero-btn-ghost" id="btn-import-json">导入笔记 JSON</button>
-<input type="file" id="import-file" accept="application/json,.json" hidden>
-</div>
-<div class="nav no-print"><strong>快跳：</strong>
-<a href="#c0">开篇</a><a href="#c3">架构</a><a href="#c5">事务</a><a href="#c9">分布式</a><a href="#c14">排障</a><a href="#c18">自测</a>
-</div>
-<div class="toc"><h2>总目录</h2><ol><li><a href="#c0">开篇：这份材料怎么用 + 比喻总表</a></li><li><a href="#c1">第一章 · PolarDB 家族全景</a></li><li><a href="#c2">第二章 · 传统架构痛点与 PolarDB 解题</a></li><li><a href="#c3">第三章 · 共享存储版核心架构（深度）</a></li><li><a href="#c4">第四章 · 复制、一致性级别与粘主</a></li><li><a href="#c5">第五章 · 事务 / 锁 / MVCC / 长事务（结合 Java）</a></li><li><a href="#c6">第六章 · 高可用与故障切换</a></li><li><a href="#c7">第七章 · 备份恢复与应急</a></li><li><a href="#c8">第八章 · 性能：缓冲、慢 SQL、加只读、写瓶颈</a></li><li><a href="#c9">第九章 · PolarDB-X：分布式总览与组件</a></li><li><a href="#c10">第十章 · 分片键、热点、全局唯一</a></li><li><a href="#c11">第十一章 · 分布式事务、全局时钟、幂等</a></li><li><a href="#c12">第十二章 · 全局索引、跨片 Join、分布式 DDL</a></li><li><a href="#c13">第十三章 · 安全、权限、审计、参数变更</a></li><li><a href="#c14">第十四章 · 监控告警与排障五步法套用</a></li><li><a href="#c15">第十五章 · 与 GaussDB / TDSQL 对照速记</a></li><li><a href="#c16">第十六章 · 综合案例集（8 个）</a></li><li><a href="#c17">第十七章 · 学习路线与能力验收</a></li><li><a href="#c18">第十八章 · 自测题（可在笔记作答）</a></li><li><a href="#c19">附录 · 小词典与常见误区</a></li></ol></div>
-<section class="card" id="c0">
-  <h2 class="ch-title"><span class="ch-no">0</span>开篇：这份材料怎么用 + 比喻总表</h2>
-  <div class="ch-body">
-<p>阿里云 <b>PolarDB</b>（口语常叫 Polar / 波拉）是云原生数据库家族。金融现场说「PolarDB 维护」，先问清两件事：</p>
-<ul>
-<li>是 <b>PolarDB（共享存储，一写多读）</b>，还是 <b>PolarDB-X（数据真分片的分布式）</b>？</li>
-<li>兼容的是 <b>MySQL 协议</b> 还是 <b>PostgreSQL 协议</b>？（排障视图/工具不同）</li>
-</ul>
-<table class="mat">
-<tr><th>大白话</th><th>PolarDB 含义</th></tr>
-<tr><td>主柜台</td><td>读写计算节点（主）</td></tr>
-<tr><td>只读柜台</td><td>只读计算节点</td></tr>
-<tr><td>金库/底账</td><td>共享分布式存储</td></tr>
-<tr><td>大堂分流</td><td>数据库代理 / 集群地址</td></tr>
-<tr><td>分柜账本</td><td>PolarDB-X 的 DN 分片</td></tr>
-<tr><td>调度大厅</td><td>PolarDB-X 的 CN</td></tr>
-</table>
-<div class="callout">每章底部可写富文本笔记（加粗/高亮），自动保存在浏览器；点顶部「导出 PDF」即可打印下载。笔记可另存 JSON 备份。</div>
-</div>
-  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c0">
-    <button type="button" data-cmd="bold">加粗</button>
-    <button type="button" data-cmd="highlight">高亮</button>
-    <button type="button" data-cmd="clear">清除格式</button>
-    <button type="button" data-cmd="save">保存笔记</button>
+  <div class="hero">
+    <h1>阿里 PolarDB / PolarDB-X<br>运维与架构手册 · 详细版</h1>
+    <p>从入门到分布式原理 · 流程图 · 案例 · 巡检门禁 · 暖色富文本笔记 · 可导出 PDF</p>
+    <div class="meta">
+      <span>手册体例 · 24 章</span>
+      <span>共享存储 PolarDB</span>
+      <span>PolarDB-X 分布式</span>
+      <span>金融现场口径</span>
+    </div>
+    <button type="button" class="hero-btn" id="btn-export-pdf">导出 / 打印 PDF</button>
+    <button type="button" class="hero-btn hero-btn-ghost" id="btn-export-json">导出笔记 JSON</button>
+    <button type="button" class="hero-btn hero-btn-ghost" id="btn-import-json">导入笔记 JSON</button>
+    <input type="file" id="import-file" accept="application/json,.json" hidden>
   </div>
-  <div class="note-editor" id="note-c0" data-nid="c0" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c1">
-  <h2 class="ch-title"><span class="ch-no">1</span>第一章 · PolarDB 家族全景</h2>
-  <div class="ch-body">
-<h3>1.1 产品定位</h3>
-<p>目标：在兼容生态（MySQL/PG）前提下，提供比传统主备更弹性的计算、更快的只读扩展、云上高可用与备份。</p>
-<h3>1.2 家族对照</h3>
-<table class="mat">
-<tr><th>产品</th><th>数据放置</th><th>写扩展</th><th>读扩展</th><th>典型替换对象</th></tr>
-<tr><td>PolarDB MySQL</td><td>共享存储</td><td>升配主节点</td><td>加只读节点</td><td>RDS MySQL / 自建 MySQL</td></tr>
-<tr><td>PolarDB PostgreSQL</td><td>共享存储</td><td>升配主节点</td><td>加只读节点</td><td>RDS PG / 自建 PG</td></tr>
-<tr><td>PolarDB-X</td><td>多分片 DN</td><td>加分片/扩 DN</td><td>CN/DN 扩展</td><td>分库分表中间件、超大单库</td></tr>
-</table>
-<pre class="flow">选型口诀
-  单库还能扛、主要缺只读与弹性 → PolarDB 共享存储版
-  单主写打满、百 TB 级、要水平扩写 → PolarDB-X
-  不确定 → 先压测写 TPS / 数据量 / 跨片事务比例再定
-</pre>
-</div>
-  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c1">
-    <button type="button" data-cmd="bold">加粗</button>
-    <button type="button" data-cmd="highlight">高亮</button>
-    <button type="button" data-cmd="clear">清除格式</button>
-    <button type="button" data-cmd="save">保存笔记</button>
+  <div class="nav no-print">
+    <strong>快跳：</strong>
+    <a href="#c00">导读</a>
+    <a href="#c04">架构</a>
+    <a href="#c06">事务</a>
+    <a href="#c10">分布式</a>
+    <a href="#c15">监控</a>
+    <a href="#c18">案例</a>
+    <a href="#c21">自测</a>
   </div>
-  <div class="note-editor" id="note-c1" data-nid="c1" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c2">
-  <h2 class="ch-title"><span class="ch-no">2</span>第二章 · 传统架构痛点与 PolarDB 解题</h2>
-  <div class="ch-body">
-<h3>2.1 传统「柜台+私人账本」</h3>
-<ul>
-<li>主备各有完整磁盘副本；备库靠日志追赶 → <b>复制延迟</b>；</li>
-<li>加只读 ≈ 再搬一套数据，慢；</li>
-<li>CPU 与磁盘绑死，弹性差。</li>
-</ul>
-<h3>2.2 PolarDB「多柜台+共享金库」</h3>
-<ul>
-<li>计算节点可横竖扩展；</li>
-<li>权威数据在共享存储，只读节点轻量拉起；</li>
-<li>失败切换更多是「换柜台」，金库还在。</li>
-</ul>
-<pre class="flow">传统主备：主账本 ──抄小票──▶ 备账本（可能旧）
-PolarDB：  主柜台 ──读写──▶ 共享金库 ◀──只读── 只读柜台
-</pre>
-</div>
-  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c2">
-    <button type="button" data-cmd="bold">加粗</button>
-    <button type="button" data-cmd="highlight">高亮</button>
-    <button type="button" data-cmd="clear">清除格式</button>
-    <button type="button" data-cmd="save">保存笔记</button>
-  </div>
-  <div class="note-editor" id="note-c2" data-nid="c2" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c3">
-  <h2 class="ch-title"><span class="ch-no">3</span>第三章 · 共享存储版核心架构（深度）</h2>
-  <div class="ch-body">
-<h3>3.1 逻辑分层</h3>
+  <div class="toc"><h2>手册目录</h2><ol><li><a href="#c00">手册导读：怎么用、面向谁、怎么验收</a></li><li><a href="#c01">第 0 章 · 大白话总对照表（先背这张）</a></li><li><a href="#c02">第 1 章 · PolarDB 家族与版本形态</a></li><li><a href="#c03">第 2 章 · 为什么需要 PolarDB：传统痛点拆解</a></li><li><a href="#c04">第 3 章 · 共享存储版架构深度（计算存储分离）</a></li><li><a href="#c05">第 4 章 · 一写多读、复制水位与读写分离策略</a></li><li><a href="#c06">第 5 章 · 事务、锁、MVCC、长事务（Java 复合视角）</a></li><li><a href="#c07">第 6 章 · 高可用：探活、切换、脑裂防护、应用侧</a></li><li><a href="#c08">第 7 章 · 备份、时间点恢复、误删应急</a></li><li><a href="#c09">第 8 章 · 性能与容量：RO 扩展、慢 SQL、写天花板</a></li><li><a href="#c10">第 9 章 · PolarDB-X 总览：何时上分布式</a></li><li><a href="#c11">第 10 章 · CN / DN / 元数据：组件职责与故障面</a></li><li><a href="#c12">第 11 章 · 分片键设计：分布式的生死线</a></li><li><a href="#c13">第 12 章 · 分布式事务、全局次序、幂等</a></li><li><a href="#c14">第 13 章 · 全局索引、跨片 Join、分布式 DDL</a></li><li><a href="#c15">第 14 章 · 日常运维监控清单（非常细）</a></li><li><a href="#c16">第 15 章 · 排障五步法（套在 Polar 上）</a></li><li><a href="#c17">第 16 章 · 与 GaussDB / TDSQL 对照手册</a></li><li><a href="#c18">第 17 章 · 综合案例库（12 个详解）</a></li><li><a href="#c19">第 18 章 · 变更规范与银行门禁（可直接落地）</a></li><li><a href="#c20">第 19 章 · 学习路线（12 周详细）</a></li><li><a href="#c21">第 20 章 · 自测题（手册级）</a></li><li><a href="#c22">附录 A · 小词典</a></li><li><a href="#c23">附录 B · 常见误区</a></li></ol></div>
+  <section class="card" id="c00"><h2 class="ch-title"><span class="ch-no">0</span>手册导读：怎么用、面向谁、怎么验收</h2><div class="ch-body">
+<p>本手册面向：从 Java/应用开发转到<strong>金融信创数据库运维</strong>、需要同时理解 <strong>PolarDB（共享存储一写多读）</strong>与 <strong>PolarDB-X（分布式分片）</strong> 的同学。</p>
+<h3>阅读路径</h3>
 <ol>
-<li><b>接入层</b>：集群地址/代理，做读写分离、屏蔽切换；</li>
-<li><b>计算层</b>：SQL 解析、优化器、事务锁、缓冲池；</li>
-<li><b>存储层</b>：分布式共享存储，负责页与日志持久化、多副本可靠。</li>
+<li><b>第 0～2 章</b>：建立地图与选型；</li>
+<li><b>第 3～8 章</b>：共享存储 PolarDB 架构、一致性、事务、HA、备份、性能；</li>
+<li><b>第 9～13 章</b>：PolarDB-X 分布式全链路；</li>
+<li><b>第 14～18 章</b>：运维排障、对照高斯/TDSQL、案例、规范、验收。</li>
 </ol>
-<h3>3.2 写路径（原理）</h3>
-<pre class="flow">UPDATE
-  → 代理（可选）→ 主计算节点
-  → 加行锁/表锁（按隔离级别）
-  → 修改缓冲中的数据页 + 产生重做日志
-  → 日志/页持久化进入共享存储（满足落定语义）
-  → 返回客户端成功
-  → 只读节点通过共享存储与同步协议获得新可见版本
+<h3>验收标准（读完应能）</h3>
+<ul>
+<li>画清「应用→代理→计算节点→共享存储/分片」；</li>
+<li>解释写后读旧、长事务、切换半成功；</li>
+<li>说明何时必须上 PolarDB-X，以及跨片事务的代价；</li>
+<li>按五步法做一次故障复盘。</li>
+</ul>
+<div class="callout">顶部可「导出/打印 PDF」。每章可写富文本笔记（加粗/高亮），浏览器本地自动保存，并支持 JSON 备份导入导出。</div>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c00">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c00" data-nid="c00" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c01"><h2 class="ch-title"><span class="ch-no">1</span>第 0 章 · 大白话总对照表（先背这张）</h2><div class="ch-body">
+<table class="mat">
+<tr><th>大白话</th><th>PolarDB / PolarDB-X</th><th>现场用途</th></tr>
+<tr><td>主柜台</td><td>读写计算节点（RW）</td><td>唯一常规写入口</td></tr>
+<tr><td>只读柜台</td><td>只读计算节点（RO）</td><td>查询/报表扩展读</td></tr>
+<tr><td>金库底账</td><td>共享分布式存储</td><td>真正持久化，节点可换</td></tr>
+<tr><td>大堂分流</td><td>集群地址 / 代理</td><td>读写分离、屏蔽切换</td></tr>
+<tr><td>办事窗口</td><td>应用连接池里的连接</td><td>连不上/泄漏会排队</td></tr>
+<tr><td>账本被人占</td><td>行锁/事务占用</td><td>超时与死锁根因</td></tr>
+<tr><td>调度大厅</td><td>PolarDB-X CN</td><td>收 SQL、下推、汇总</td></tr>
+<tr><td>分柜账本</td><td>PolarDB-X DN 分片</td><td>数据切开存放</td></tr>
+<tr><td>总登记处</td><td>元数据 / GMS 等</td><td>拓扑、规则、全局信息</td></tr>
+<tr><td>粘主</td><td>写后关键读走主节点</td><td>防「写完读旧」</td></tr>
+</table>
+<div class="key">先问现场：你们说的 Polar 是「共享存储版」还是「PolarDB-X」？答错后面全歪。</div>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c01">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c01" data-nid="c01" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c02"><h2 class="ch-title"><span class="ch-no">2</span>第 1 章 · PolarDB 家族与版本形态</h2><div class="ch-body">
+<h3>1.1 一句话定义</h3>
+<p>PolarDB 是阿里云的云原生数据库产品线：对应用尽量兼容 MySQL/PostgreSQL 生态，对内用<strong>计算与存储分离</strong>、弹性节点、共享存储（或分布式分片）来解决传统主备扩容慢、只读贵、资源绑死的问题。</p>
+<h3>1.2 家族表</h3>
+<table class="mat">
+<tr><th>产品</th><th>协议兼容</th><th>数据怎么放</th><th>写怎么扩</th><th>读怎么扩</th><th>典型场景</th></tr>
+<tr><td>PolarDB MySQL 版</td><td>MySQL</td><td>共享存储</td><td>升配主节点</td><td>加 RO</td><td>替代大 RDS MySQL</td></tr>
+<tr><td>PolarDB PostgreSQL 版</td><td>PostgreSQL</td><td>共享存储</td><td>升配主节点</td><td>加 RO</td><td>企业 PG 上云</td></tr>
+<tr><td>PolarDB-X</td><td>MySQL 生态为主</td><td>DN 分片</td><td>加分片/扩 DN</td><td>CN/DN 扩展</td><td>超大库、高并发写</td></tr>
+</table>
+<h3>1.3 金融现场沟通清单</h3>
+<ol>
+<li>实例是 PolarDB 还是 PolarDB-X？</li>
+<li>引擎版本与小版本号？</li>
+<li>有几个 RO？代理是否开启读写分离？</li>
+<li>备份保留几天？最近一次恢复演练何时？</li>
+<li>是否有跨片事务/全局索引？</li>
+</ol>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c02">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c02" data-nid="c02" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c03"><h2 class="ch-title"><span class="ch-no">3</span>第 2 章 · 为什么需要 PolarDB：传统痛点拆解</h2><div class="ch-body">
+<h3>2.1 传统主备「柜台+私人账本」</h3>
+<ul>
+<li>主、备各有完整数据文件；备靠日志追 → <b>复制延迟</b>；</li>
+<li>加只读 ≈ 再搬一套盘，耗时长、成本高；</li>
+<li>CPU 不够要整机升，磁盘浪费或不够都难受；</li>
+<li>切换时要确认数据追上，RTO/RPO 受复制质量影响。</li>
+</ul>
+<pre class="flow">传统：应用 → 主库(盘A) ──日志──▶ 备库(盘B)
+问题：盘B 落后 → 读旧；加备要拷盘；计算与盘绑死
+</pre>
+<h3>2.2 PolarDB 解题：多柜台共享金库</h3>
+<ul>
+<li>计算节点可加减；</li>
+<li>权威数据在共享存储；</li>
+<li>RO 轻量拉起，扩展读更快。</li>
+</ul>
+<pre class="flow">PolarDB：应用 → 代理 → 主柜台/只读柜台
+                         └──── 共享金库（多副本可靠）
+</pre>
+<div class="warn">注意：共享存储版<strong>写仍然集中在主计算节点</strong>。写到天花板，要优化 SQL/热点，或评估 PolarDB-X。</div>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c03">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c03" data-nid="c03" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c04"><h2 class="ch-title"><span class="ch-no">4</span>第 3 章 · 共享存储版架构深度（计算存储分离）</h2><div class="ch-body">
+<h3>3.1 三层结构</h3>
+<table class="mat">
+<tr><th>层</th><th>组件</th><th>职责</th><th>挂了会怎样</th></tr>
+<tr><td>接入</td><td>集群地址/代理</td><td>路由、读写分离、屏蔽切换</td><td>连不上或路由错</td></tr>
+<tr><td>计算</td><td>RW / RO 节点</td><td>SQL、事务、锁、缓冲</td><td>切换/只读摘流</td></tr>
+<tr><td>存储</td><td>共享分布式存储</td><td>页与日志持久化、多副本</td><td>写失败/只读（极端）</td></tr>
+</table>
+<h3>3.2 写路径（逐步）</h3>
+<pre class="flow">1. 应用拿连接（办事窗口）打到代理/主地址
+2. 主计算节点解析 SQL、鉴权、优化计划
+3. 按隔离级别加锁，修改缓冲中的数据页
+4. 产生重做/事务日志，持久化到共享存储（落定语义）
+5. 返回客户端成功
+6. RO 通过共享存储与同步机制看到新可见版本
 </pre>
 <h3>3.3 读路径</h3>
-<pre class="flow">SELECT
-  → 代理按策略：主 or 只读
-  → 计算节点缓冲命中？命中则还
-  → 否则向共享存储拉页
-  → 返回结果集
+<pre class="flow">SELECT → 代理判定走主或 RO
+      → 计算节点缓冲命中？命中则返回
+      → 否则从共享存储拉页 → 返回结果
 </pre>
-<h3>3.4 深度要点</h3>
+<h3>3.4 架构含义（运维必懂）</h3>
 <ul>
-<li><b>一写多读</b>：常态仅一个写者，避免多主冲突；</li>
-<li><b>计算无状态化趋势</b>：节点可替换，状态尽量在存储；</li>
-<li><b>本地盘角色</b>：多为临时/日志缓冲/缓存，不是业务权威副本（以产品实际为准）。</li>
+<li>换计算节点 ≠ 丢数据（存储仍在），但仍要防切换中应用半成功；</li>
+<li>RO 不是「另一套完整私人账本」叙事，而是共享金库上的只读计算；</li>
+<li>监控既要看节点 CPU/会话，也要看存储水位与 I/O。</li>
 </ul>
-<div class="key">记住：应用看见的「库」，是「计算入口」；数据耐造靠「共享金库」。</div>
+<div class="key">一句话：多个大脑（计算），一个金库（存储）；写集中，读可加柜台。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c3">
+  <div class="note-toolbar" data-for="note-c04">
     <button type="button" data-cmd="bold">加粗</button>
     <button type="button" data-cmd="highlight">高亮</button>
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c3" data-nid="c3" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c4">
-  <h2 class="ch-title"><span class="ch-no">4</span>第四章 · 复制、一致性级别与粘主</h2>
-  <div class="ch-body">
-<h3>4.1 现场高频：写完读旧</h3>
-<p>支付成功页若走只读地址，可能读到切换前快照。处理分级：</p>
+  <div class="note-editor" id="note-c04" data-nid="c04" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c05"><h2 class="ch-title"><span class="ch-no">5</span>第 4 章 · 一写多读、复制水位与读写分离策略</h2><div class="ch-body">
+<h3>4.1 现场第一案：「写完读旧」</h3>
+<p>用户支付成功，结果页走 RO，短时仍显示未支付。根因是可见性水位，不是「没写入」。</p>
 <table class="mat">
-<tr><th>接口类型</th><th>建议</th></tr>
-<tr><td>支付结果/余额/冲正前核对</td><td>粘主（读主节点）</td></tr>
-<tr><td>订单列表、内容浏览</td><td>可读只读</td></tr>
-<tr><td>报表分析</td><td>只读 + 接受延迟</td></tr>
+<tr><th>接口类型</th><th>建议读哪里</th><th>原因</th></tr>
+<tr><td>支付结果、余额、冲正前核对</td><td class="bad">必须粘主</td><td>错不得</td></tr>
+<tr><td>订单列表、内容浏览</td><td>RO 可</td><td>可接受短暂旧</td></tr>
+<tr><td>报表/导出</td><td>RO + 隔离</td><td>别打主</td></tr>
 </table>
-<pre class="flow">写成功
-  ├─ 强一致需求 → 读主 / 会话粘滞主
-  ├─ 可延迟 → 读只读（监控延迟水位）
-  └─ 延迟超阈 → 摘流或降级提示
+<pre class="flow">写成功？
+  ├─ 强一致接口 → 读主 / 会话粘滞主
+  ├─ 可延迟 → 读 RO（盯延迟水位）
+  └─ 水位超阈 → 摘流 RO 或提示稍后
 </pre>
-<h3>4.2 原理</h3>
-<p>只读可见性依赖同步协议与水位。运维要会看：只读延迟、是否可接流量、切换后连接是否漂移。</p>
+<h3>4.2 代理策略清单</h3>
+<ul>
+<li>是否按 SQL 类型自动分流？</li>
+<li>是否支持会话级 hint/强制主？</li>
+<li>RO 全部不健康时是否回落主？（回落会加重主压）</li>
+</ul>
+<div class="callout">和工行「抄写柜台」同一类问题：能读备/RO，不代表能当支付确认页。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c4">
+  <div class="note-toolbar" data-for="note-c05">
     <button type="button" data-cmd="bold">加粗</button>
     <button type="button" data-cmd="highlight">高亮</button>
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c4" data-nid="c4" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c5">
-  <h2 class="ch-title"><span class="ch-no">5</span>第五章 · 事务 / 锁 / MVCC / 长事务（结合 Java）</h2>
-  <div class="ch-body">
-<h3>5.1 三者关系</h3>
-<pre class="flow">事务 = 一捆要一起成或一起回滚的操作
-锁   = 防止别人同时乱改同一行
-MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
-</pre>
-<h3>5.2 Java 侧高发根因 → 库侧现象</h3>
+  <div class="note-editor" id="note-c05" data-nid="c05" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c06"><h2 class="ch-title"><span class="ch-no">6</span>第 5 章 · 事务、锁、MVCC、长事务（Java 复合视角）</h2><div class="ch-body">
+<h3>5.1 概念</h3>
+<ul>
+<li><b>事务</b>：一捆操作一起成功或一起回滚；</li>
+<li><b>锁</b>：保护同一行不被乱改；</li>
+<li><b>MVCC</b>：用多版本让读尽量不堵写（看复印件）。</li>
+</ul>
+<h3>5.2 Java → 库现象映射</h3>
 <table class="mat">
-<tr><th>代码味道</th><th>库现象</th><th>改法</th></tr>
-<tr><td>@Transactional 包住远程调用</td><td>长事务、锁久</td><td>事务最小化</td></tr>
-<tr><td>循环单条更新热点用户</td><td>锁等待链</td><td>批量/排队</td></tr>
-<tr><td>一次删除千万行</td><td>大事务、空间涨</td><td>分批幂等</td></tr>
-<tr><td>只读报表忘关连接</td><td>版本堆积</td><td>短查询+超时</td></tr>
-<tr><td>捕获异常后不抛出</td><td>业务以为失败，库已提交或未回滚</td><td>事务边界清晰</td></tr>
+<tr><th>代码味道</th><th>库侧现象</th><th>处理</th></tr>
+<tr><td>事务里调远程/睡眠</td><td>长事务、锁久占</td><td>缩小事务边界</td></tr>
+<tr><td>循环更新同热用户</td><td>锁等待链</td><td>合并更新/排队</td></tr>
+<tr><td>一次删改千万行</td><td>大事务、空间涨、切换慢</td><td>分批+幂等续跑</td></tr>
+<tr><td>异常吞掉不回滚</td><td>半成功、状态分裂</td><td>明确回滚/提交</td></tr>
+<tr><td>只读报表事务不关</td><td>版本堆积、空间压</td><td>短查询+超时</td></tr>
 </table>
-<pre class="flow">排障顺序
-  发现超时 → 查锁等待/谁占谁
-          → 回追 SQL 与会话来源
-          → 对到 Java 调用栈/事务边界
-          → 临时杀会话（慎）+ 根治代码
+<pre class="flow">排障
+  超时投诉 → 查锁等待/长事务
+           → 找到会话与 SQL
+           → 追到应用事务边界
+           → 临时处置（慎杀）+ 根治代码/限流
 </pre>
+<div class="key">你的优势：别人只看见锁；你能指出「事务传播/循环改账/吞异常」。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c5">
+  <div class="note-toolbar" data-for="note-c06">
     <button type="button" data-cmd="bold">加粗</button>
     <button type="button" data-cmd="highlight">高亮</button>
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c5" data-nid="c5" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c6">
-  <h2 class="ch-title"><span class="ch-no">6</span>第六章 · 高可用与故障切换</h2>
-  <div class="ch-body">
-<pre class="flow">主节点故障
-  → 探活失败（连续）
-  → 管控防脑裂决策（租约/仲裁）
-  → 新主从只读/候选提升
-  → 存储层认新写者
+  <div class="note-editor" id="note-c06" data-nid="c06" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c07"><h2 class="ch-title"><span class="ch-no">7</span>第 6 章 · 高可用：探活、切换、脑裂防护、应用侧</h2><div class="ch-body">
+<pre class="flow">主节点探活连续失败
+  → 管控判定（租约/仲裁，防双主）
+  → 提升 RO/候选为新主
+  → 存储认新写者租约
   → 代理切流
-  → 应用连接池重连 + 幂等核对半成功
+  → 应用连接池重连
+  → 用业务键核对半成功（禁盲重试）
 </pre>
+<h3>6.1 运维检查单</h3>
 <ul>
-<li>切换期：短拒绝或只读；</li>
-<li>最怕：应用盲重试造成双写；</li>
-<li>演练：比文档重要，记录 RTO。</li>
+<li>切换事件时间线、谁触发；</li>
+<li>切换后是否有双写窗口；</li>
+<li>RO 是否追上、可否重新挂只读流量；</li>
+<li>应用错误码：是否可重试、是否幂等。</li>
 </ul>
+<div class="warn">高可用不是应用免责金牌。切换瞬间最怕半成功 + 盲重试双扣。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c6">
+  <div class="note-toolbar" data-for="note-c07">
     <button type="button" data-cmd="bold">加粗</button>
     <button type="button" data-cmd="highlight">高亮</button>
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c6" data-nid="c6" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c7">
-  <h2 class="ch-title"><span class="ch-no">7</span>第七章 · 备份恢复与应急</h2>
-  <div class="ch-body">
-<pre class="flow">日常：自动快照 + 日志保留
-误删/错更：
-  选时间点 T → 恢复出临时实例 → 校验 → 导回/订正 → 复盘变更门禁
-盘满：
-  先保写 → 清临时/过期日志（按规范）→ 扩容 → 禁乱删备份链
+  <div class="note-editor" id="note-c07" data-nid="c07" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c08"><h2 class="ch-title"><span class="ch-no">8</span>第 7 章 · 备份、时间点恢复、误删应急</h2><div class="ch-body">
+<h3>7.1 备份在保什么</h3>
+<p>共享存储快照/数据页 + 日志链，支持按时间点恢复（以控制台与版本为准）。</p>
+<pre class="flow">定期快照 ─┐
+日志保留 ─┼→ 选时间点 T → 恢复临时实例 → 校验 → 导回/订正
+手工全备 ─┘
 </pre>
-<p>银行口径：恢复要清单化（RPO/RTO、是否含某日志、谁验收）。</p>
-</div>
-  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c7">
-    <button type="button" data-cmd="bold">加粗</button>
-    <button type="button" data-cmd="highlight">高亮</button>
-    <button type="button" data-cmd="clear">清除格式</button>
-    <button type="button" data-cmd="save">保存笔记</button>
-  </div>
-  <div class="note-editor" id="note-c7" data-nid="c7" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c8">
-  <h2 class="ch-title"><span class="ch-no">8</span>第八章 · 性能：缓冲、慢 SQL、加只读、写瓶颈</h2>
-  <div class="ch-body">
-<h3>8.1 读扩展</h3>
-<p>加只读 + 代理分流。慢 SQL 会打爆只读，一样事故。</p>
-<h3>8.2 写瓶颈</h3>
-<pre class="flow">写打满？
-  1) 热点行/锁（业务）
-  2) 低效 SQL（缺索引、大事务）
-  3) 主节点 CPU/IO 升配
-  4) 仍不够 → PolarDB-X 或业务拆分
-</pre>
-</div>
-  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c8">
-    <button type="button" data-cmd="bold">加粗</button>
-    <button type="button" data-cmd="highlight">高亮</button>
-    <button type="button" data-cmd="clear">清除格式</button>
-    <button type="button" data-cmd="save">保存笔记</button>
-  </div>
-  <div class="note-editor" id="note-c8" data-nid="c8" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c9">
-  <h2 class="ch-title"><span class="ch-no">9</span>第九章 · PolarDB-X：分布式总览与组件</h2>
-  <div class="ch-body">
+<h3>7.2 误删表标准动作</h3>
+<ol>
+<li>停继续破坏的操作；</li>
+<li>确认大约时间点；</li>
+<li>恢复到临时实例，不直接盖生产；</li>
+<li>导出缺失数据回灌；</li>
+<li>复盘权限与变更门禁。</li>
+</ol>
 <table class="mat">
-<tr><th>组件</th><th>大白话</th><th>职责</th></tr>
-<tr><td>CN</td><td>调度大厅</td><td>收 SQL、计划、下推、汇总</td></tr>
-<tr><td>DN</td><td>分柜金库</td><td>存分片、本地事务执行</td></tr>
-<tr><td>元数据服务</td><td>总登记处</td><td>拓扑、规则、全局信息</td></tr>
-<tr><td>变更组件</td><td>搬家队</td><td>DDL、扩缩容、同步</td></tr>
+<tr><th>指标</th><th>含义</th></tr>
+<tr><td>RPO</td><td>最多丢多久数据</td></tr>
+<tr><td>RTO</td><td>多久恢复可服务</td></tr>
 </table>
-<pre class="flow">SQL → CN 解析
-     ├─ 单片 → 下推 1 个 DN（最佳）
-     ├─ 多片 → 并行 DN → CN 归并
-     └─ 跨片事务 → 全局协调
-</pre>
-<div class="callout">与共享存储 PolarDB 最大区别：数据切开了；跨片是常态成本来源。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
-  <div class="note-toolbar" data-for="note-c9">
+  <div class="note-toolbar" data-for="note-c08">
     <button type="button" data-cmd="bold">加粗</button>
     <button type="button" data-cmd="highlight">高亮</button>
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c9" data-nid="c9" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c10">
-  <h2 class="ch-title"><span class="ch-no">10</span>第十章 · 分片键、热点、全局唯一</h2>
-  <div class="ch-body">
+  <div class="note-editor" id="note-c08" data-nid="c08" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c09"><h2 class="ch-title"><span class="ch-no">9</span>第 8 章 · 性能与容量：RO 扩展、慢 SQL、写天花板</h2><div class="ch-body">
+<h3>8.1 读扩展</h3>
+<p>加 RO + 代理分流。慢 SQL/大报表会打爆 RO，一样事故。</p>
+<h3>8.2 写扩展边界</h3>
+<pre class="flow">写打满诊断顺序
+  1. 热点行/锁（业务）
+  2. 缺索引/烂 SQL/大事务
+  3. 主节点 CPU/IO 升配
+  4. 仍不够 → PolarDB-X 或业务拆分
+</pre>
+<h3>8.3 容量</h3>
 <ul>
-<li>高频交易尽量 <b>单分片闭环</b>（按账号/用户）；</li>
-<li>时间分片易热点；</li>
-<li>全局唯一用号段/雪花，避免各片撞号；</li>
-<li>扩容重分布=重变更，要窗口与校验。</li>
+<li>存储水位、临时文件、日志膨胀；</li>
+<li>连接数/窗口总和；</li>
+<li>活动日按峰值估，不按平均。</li>
 </ul>
-<pre class="flow">好设计：账号ID → 固定 DN → 本地强一致事务快
-坏设计：每次按手机号模糊查 → 广播所有 DN → 拖死集群
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c09">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c09" data-nid="c09" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c10"><h2 class="ch-title"><span class="ch-no">10</span>第 9 章 · PolarDB-X 总览：何时上分布式</h2><div class="ch-body">
+<h3>9.1 上分布式的信号</h3>
+<ul>
+<li>单主写持续打满且优化空间有限；</li>
+<li>数据体量与连接数远超单机舒适区；</li>
+<li>业务可接受分片模型（有稳定分片键）。</li>
+</ul>
+<div class="warn">跨片事务多、全局模糊查多为常态时，分布式可能更慢更贵——先评估工作负载。</div>
+<pre class="flow">应用 → CN（调度）
+         ├─ 单片 SQL → 1 个 DN（最快）
+         ├─ 多片 SQL → 多 DN 并行 → CN 汇总
+         └─ 跨片事务 → 全局协调（最贵）
 </pre>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
@@ -343,22 +392,17 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c10" data-nid="c10" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c11">
-  <h2 class="ch-title"><span class="ch-no">11</span>第十一章 · 分布式事务、全局时钟、幂等</h2>
-  <div class="ch-body">
-<pre class="flow">跨片转账
-  CN 开全局事务
-    DN_A 预提交 ──┐
-    DN_B 预提交 ──┼─ 都成功？提交：否则回滚
-  超时：应用用业务键查终态，禁止盲重试
-</pre>
-<ul>
-<li>能单片就单片（性能与稳定性数量级差）；</li>
-<li>全局事务依赖全局次序/时钟类机制保证可见性与提交序（不同版本实现细节有别）；</li>
-<li>金融：幂等键含业务单号+动作类型。</li>
-</ul>
-<div class="key">分布式事务是税；分片设计是避税。</div>
+  <div class="note-editor" id="note-c10" data-nid="c10" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c11"><h2 class="ch-title"><span class="ch-no">11</span>第 10 章 · CN / DN / 元数据：组件职责与故障面</h2><div class="ch-body">
+<table class="mat">
+<tr><th>组件</th><th>大白话</th><th>职责</th><th>故障表现</th></tr>
+<tr><td>CN</td><td>调度大厅</td><td>解析、改写、下推、汇总</td><td>入口不可用/计划异常</td></tr>
+<tr><td>DN</td><td>分柜金库</td><td>存分片、本地执行</td><td>部分数据不可用、该片变慢</td></tr>
+<tr><td>元数据</td><td>总登记处</td><td>拓扑、规则、全局信息</td><td>路由错、DDL 卡住</td></tr>
+<tr><td>变更/同步</td><td>搬家队</td><td>DDL、扩缩容、同步</td><td>任务堆积、漂移</td></tr>
+</table>
+<div class="callout">排障先定位：是入口（CN）、某柜（DN）、还是登记处（元数据）。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c11">
@@ -367,15 +411,24 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c11" data-nid="c11" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c12">
-  <h2 class="ch-title"><span class="ch-no">12</span>第十二章 · 全局索引、跨片 Join、分布式 DDL</h2>
-  <div class="ch-body">
-<p>按 A 分片却按 B 查：全局二级索引或多分片扫描。写入要维护索引，更贵。</p>
-<pre class="flow">DDL 加列/加索引
-  元数据编排 → 各 DN 执行/回填 → 切换 → 观察
-失败：按变更单回滚，禁手工改一半
+  <div class="note-editor" id="note-c11" data-nid="c11" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c12"><h2 class="ch-title"><span class="ch-no">12</span>第 11 章 · 分片键设计：分布式的生死线</h2><div class="ch-body">
+<h3>11.1 好键与坏键</h3>
+<table class="mat">
+<tr><th>类型</th><th>例子</th><th>结果</th></tr>
+<tr><td>好</td><td>账号/用户 ID</td><td>高频交易单片闭环</td></tr>
+<tr><td>差</td><td>纯时间戳</td><td>最新分片热点</td></tr>
+<tr><td>差</td><td>经常变更的字段</td><td>重分布痛苦</td></tr>
+<tr><td>危险查询</td><td>无分片条件模糊查</td><td>广播扫全 DN</td></tr>
+</table>
+<pre class="flow">设计检查
+  1) Top SQL 是否大多单片？
+  2) 是否存在必做的跨片事务？比例多少？
+  3) 全局唯一如何发号？
+  4) 扩容是否可在线、如何校验？
 </pre>
+<div class="key">分片键选错，后面所有优化都是打补丁。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c12">
@@ -384,16 +437,22 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c12" data-nid="c12" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c13">
-  <h2 class="ch-title"><span class="ch-no">13</span>第十三章 · 安全、权限、审计、参数变更</h2>
-  <div class="ch-body">
+  <div class="note-editor" id="note-c12" data-nid="c12" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c13"><h2 class="ch-title"><span class="ch-no">13</span>第 12 章 · 分布式事务、全局次序、幂等</h2><div class="ch-body">
+<pre class="flow">跨片转账
+  CN 开启全局事务
+    → DN_A 预提交
+    → DN_B 预提交
+    → 全成功则提交，否则回滚
+  超时：应用用业务键查终态，禁止盲重试
+</pre>
 <ul>
-<li>账号最小权限；只读账号不能碰敏感；</li>
-<li>变更参数分「即刻生效 / 需重启」两类，变更单写清；</li>
-<li>审计：谁在何时跑了高危 SQL；</li>
-<li>网络：白名单、SSL/专线按行方规范。</li>
+<li>能单片就单片（性能与稳定性数量级差异）；</li>
+<li>全局事务依赖全局提交序/时间戳类机制保证可见性；</li>
+<li>金融幂等键建议：业务单号 + 动作类型 + 分片相关键。</li>
 </ul>
+<div class="warn">「有分布式事务」≠「可以随便跨片设计」。税很重。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c13">
@@ -402,19 +461,20 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c13" data-nid="c13" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c14">
-  <h2 class="ch-title"><span class="ch-no">14</span>第十四章 · 监控告警与排障五步法套用</h2>
-  <div class="ch-body">
-<table class="mat">
-<tr><th>五步</th><th>PolarDB 例子</th></tr>
-<tr><td>东西</td><td>主节点、只读、代理、存储水位、锁、SQL</td></tr>
-<tr><td>规矩</td><td>延迟阈值、长事务阈值、空间阈值、切换策略</td></tr>
-<tr><td>冲突表</td><td>读写分离策略 × 接口类型</td></tr>
-<tr><td>止血</td><td>摘流、杀长事务、限流报表、切主（按规范）</td></tr>
-<tr><td>根治</td><td>索引/SQL/粘主策略/分片键改造</td></tr>
-</table>
-<pre class="flow">告警 → 可用性 → 延迟 → 会话锁 → SQL → 空间/任务
+  <div class="note-editor" id="note-c13" data-nid="c13" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c14"><h2 class="ch-title"><span class="ch-no">14</span>第 13 章 · 全局索引、跨片 Join、分布式 DDL</h2><div class="ch-body">
+<h3>13.1 全局索引</h3>
+<p>数据按 A 分、按 B 查时需要。写入要维护索引，成本更高；要评估必要性。</p>
+<h3>13.2 跨片 Join</h3>
+<p>尽量下推/改写业务减少大跨片关联；报表可同步到分析库。</p>
+<h3>13.3 分布式 DDL</h3>
+<pre class="flow">变更单审批 → 窗口
+  → 元数据编排
+  → 各 DN 执行/回填
+  → 切换可见
+  → 观察慢查询与任务队列
+失败 → 按回滚预案，禁止手工改一半
 </pre>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
@@ -424,16 +484,23 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c14" data-nid="c14" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c15">
-  <h2 class="ch-title"><span class="ch-no">15</span>第十五章 · 与 GaussDB / TDSQL 对照速记</h2>
-  <div class="ch-body">
+  <div class="note-editor" id="note-c14" data-nid="c14" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c15"><h2 class="ch-title"><span class="ch-no">15</span>第 14 章 · 日常运维监控清单（非常细）</h2><div class="ch-body">
 <table class="mat">
-<tr><th>维度</th><th>PolarDB</th><th>GaussDB</th><th>TDSQL</th></tr>
-<tr><td>云原生共享存储叙事</td><td>强</td><td>有自家分布式形态</td><td>分片套件叙事强</td></tr>
-<tr><td>运维统一抓手</td><td>节点+存储+代理</td><td>实例/组件</td><td>实例/分片</td></tr>
-<tr><td>你的优势用法</td><td colspan="3">Java 追事务与 SQL 根因，三套通用</td></tr>
+<tr><th>类别</th><th>看什么</th><th>阈值</th><th>异常动作</th></tr>
+<tr><td>可用性</td><td>RW/RO/代理/切换事件</td><td>实时</td><td>确认 HA、通知应用</td></tr>
+<tr><td>延迟</td><td>RO 水位</td><td>实时</td><td>超阈摘流/粘主</td></tr>
+<tr><td>会话</td><td>活跃、锁等待、长事务</td><td>5～15 分</td><td>定位 SQL/应用</td></tr>
+<tr><td>SQL</td><td>慢查询、全表扫</td><td>日/周</td><td>优化/限流</td></tr>
+<tr><td>空间</td><td>存储、临时、日志</td><td>日</td><td>扩容/清理规范</td></tr>
+<tr><td>连接</td><td>连接数、拒绝连接</td><td>实时</td><td>查泄漏/配额</td></tr>
+<tr><td>分布式</td><td>CN/DN 负载、跨片比、DDL 任务</td><td>日</td><td>热点与任务堆积</td></tr>
+<tr><td>备份</td><td>成功与否、保留期</td><td>日</td><td>补备/演练</td></tr>
 </table>
+<pre class="flow">告警优先级
+  不能写 > 大面积不能读 > 延迟超阈 > 锁堵 > 空间 > 慢 SQL 毛刺
+</pre>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c15">
@@ -442,29 +509,18 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c15" data-nid="c15" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c16">
-  <h2 class="ch-title"><span class="ch-no">16</span>第十六章 · 综合案例集（8 个）</h2>
-  <div class="ch-body">
-<h3>A. 写后读旧</h3>
-<p>粘主；接口分级。</p>
-<h3>B. 只读被报表打满</h3>
-<p>独立地址+限流+优化。</p>
-<h3>C. 切换后连接池打到旧主</h3>
-<p>短重试+刷新拓扑；检查代理。</p>
-<h3>D. 大事务DDL卡业务</h3>
-<p>窗口变更；拆批。</p>
-<h3>E. PolarDB-X 跨片超时双扣嫌疑</h3>
-<p>先对账；查全局事务；幂等。</p>
-<h3>F. 分片热点</h3>
-<p>换键/打散；限流。</p>
-<h3>G. 存储水位高</h3>
-<p>查临时/日志/大表；扩容。</p>
-<h3>H. 权限误授导致误删</h3>
-<p>回收权限；时间点恢复。</p>
-<pre class="flow">任一案例
-  定性东西 → 对账防资金事故 → 止血 → 复盘门禁
-</pre>
+  <div class="note-editor" id="note-c15" data-nid="c15" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c16"><h2 class="ch-title"><span class="ch-no">16</span>第 15 章 · 排障五步法（套在 Polar 上）</h2><div class="ch-body">
+<table class="mat">
+<tr><th>步骤</th><th>问什么</th><th>Polar 例子</th></tr>
+<tr><td>东西</td><td>卡的是什么</td><td>连接、锁、RO 水位、某 DN、DDL 任务</td></tr>
+<tr><td>规矩</td><td>门槛是什么</td><td>超时、延迟阈值、权限、切换策略</td></tr>
+<tr><td>冲突表</td><td>哪格最危险</td><td>读写策略×接口；跨片×重试</td></tr>
+<tr><td>止血</td><td>今天怎么停血</td><td>摘流、杀长事务、限流、禁盲重试</td></tr>
+<tr><td>根治</td><td>以后怎么不再犯</td><td>粘主规范、分片键、索引、门禁</td></tr>
+</table>
+<div class="key">五步法在高斯/TDSQL/Polar 通用；变的是命令，不变的是链路思维。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c16">
@@ -473,18 +529,18 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c16" data-nid="c16" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c17">
-  <h2 class="ch-title"><span class="ch-no">17</span>第十七章 · 学习路线与能力验收</h2>
-  <div class="ch-body">
-<ol>
-<li>周1：分清产品形态；画拓扑；会看主/只读/水位。</li>
-<li>周2-3：会话、锁、慢 SQL、粘主策略。</li>
-<li>月1-2：备份恢复/HA 演练复盘。</li>
-<li>月3-6：PolarDB-X 分片评审、跨片事务、DDL。</li>
-<li>持续：SQL/事务评审（Java 优势）。</li>
-</ol>
-<div class="key">验收：能当场画出「应用→代理→计算节点→存储/分片」并指出故障可能落点。</div>
+  <div class="note-editor" id="note-c16" data-nid="c16" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c17"><h2 class="ch-title"><span class="ch-no">17</span>第 16 章 · 与 GaussDB / TDSQL 对照手册</h2><div class="ch-body">
+<table class="mat">
+<tr><th>维度</th><th>PolarDB</th><th>GaussDB</th><th>TDSQL</th></tr>
+<tr><td>共享存储叙事</td><td>强（经典 PolarDB）</td><td>有自家分布式形态</td><td>分片套件常见</td></tr>
+<tr><td>写入口</td><td>RW 节点</td><td>主</td><td>主/Set</td></tr>
+<tr><td>读扩展</td><td>RO</td><td>备/只读</td><td>备</td></tr>
+<tr><td>水平扩写</td><td>PolarDB-X</td><td>分布式版/分片</td><td>分布式组件</td></tr>
+<tr><td>你的打法</td><td colspan="3">Java 追事务/SQL 根因 + 各产品补命令手感</td></tr>
+</table>
+<p>建议建立自己的「三套库对照笔记」：同一故障现象，在三套上各记一条查法。</p>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c17">
@@ -493,20 +549,39 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c17" data-nid="c17" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c18">
-  <h2 class="ch-title"><span class="ch-no">18</span>第十八章 · 自测题（可在笔记作答）</h2>
-  <div class="ch-body">
-<ol>
-<li>用大白话解释 PolarDB 与传统主备的差别。</li>
-<li>为什么写后读只读会旧？怎么分级处理？</li>
-<li>长事务为什么危险？举一个 Java 例子。</li>
-<li>何时必须上 PolarDB-X？</li>
-<li>跨片事务超时，应用侧正确姿势是什么？</li>
-<li>分片键选时间字段的风险？</li>
-<li>画出 HA 切换步骤。</li>
-<li>三套库（高斯/TDSQL/Polar）排障共通五步？</li>
-</ol>
+  <div class="note-editor" id="note-c17" data-nid="c17" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c18"><h2 class="ch-title"><span class="ch-no">18</span>第 17 章 · 综合案例库（12 个详解）</h2><div class="ch-body">
+<h3>A. 写后读旧</h3>
+<p>支付页走 RO。止血：粘主。根治：接口分级规范。</p>
+<h3>B. RO 被报表打满</h3>
+<p>摘流、独立地址、优化 SQL、限流。</p>
+<h3>C. 切换后连接打旧主</h3>
+<p>连接池重试刷新；查代理拓扑。</p>
+<h3>D. 长事务堵切换/堵业务</h3>
+<p>找到来源应用；拆事务；超时门禁。</p>
+<h3>E. 大事务 DDL 卡死</h3>
+<p>窗口变更；拆批；回滚预案。</p>
+<h3>F. PolarDB-X 跨片超时像双扣</h3>
+<p>先对账；查全局事务终态；幂等。</p>
+<pre class="flow">F 详拆
+  超时 → 查全局事务/各 DN
+       → 已提交：返回成功并补偿展示
+       → 未提交：回滚或人工
+       → 应用禁盲重试
+</pre>
+<h3>G. 分片热点</h3>
+<p>换键/打散；限流；扩容。</p>
+<h3>H. 广播查询拖死</h3>
+<p>加分片条件；全局索引评估；走分析库。</p>
+<h3>I. 存储水位高</h3>
+<p>查大表/临时/日志；规范清理；扩容。</p>
+<h3>J. 连接打满</h3>
+<p>查泄漏；降池；杀假活。</p>
+<h3>K. 权限过大误删</h3>
+<p>回收权限；时间点恢复；门禁。</p>
+<h3>L. 参数改完不生效</h3>
+<p>区分重启类；变更单写清。</p>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c18">
@@ -515,17 +590,18 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c18" data-nid="c18" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
-</section><section class="card" id="c19">
-  <h2 class="ch-title"><span class="ch-no">19</span>附录 · 小词典与常见误区</h2>
-  <div class="ch-body">
-<table class="mat">
-<tr><th>误区</th><th>纠正</th></tr>
-<tr><td>有只读就不延迟</td><td>仍可能有水位，关键读要策略</td></tr>
-<tr><td>分布式一定更快</td><td>跨片可能更慢</td></tr>
-<tr><td>云数据库不用管备份</td><td>要管保留、演练、误删恢复路径</td></tr>
-<tr><td>运维只需点控制台</td><td>要懂链路与业务半成功</td></tr>
-</table>
+  <div class="note-editor" id="note-c18" data-nid="c18" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c19"><h2 class="ch-title"><span class="ch-no">19</span>第 18 章 · 变更规范与银行门禁（可直接落地）</h2><div class="ch-body">
+<ol>
+<li>变更单：目的、影响面、回滚、窗口、观察指标；</li>
+<li>高危：DDL、大删改、扩缩容、参数重启类、权限变更；</li>
+<li>先演练环境，再生产；</li>
+<li>执行中双人复核；</li>
+<li>执行后观察：错误率、延迟、锁、空间、慢 SQL；</li>
+<li>失败按回滚，不即兴发挥。</li>
+</ol>
+<div class="warn">金融库：正确优先于快。半成功可见，禁止默默当成功。</div>
 </div>
   <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
   <div class="note-toolbar" data-for="note-c19">
@@ -534,42 +610,148 @@ MVCC = 用版本让读少阻塞写（通俗：多人看不同版本复印件）
     <button type="button" data-cmd="clear">清除格式</button>
     <button type="button" data-cmd="save">保存笔记</button>
   </div>
-  <div class="note-editor" id="note-c19" data-nid="c19" contenteditable="true" data-placeholder="记录：原理要点 / 现场映射 / 疑问…"></div>
+  <div class="note-editor" id="note-c19" data-nid="c19" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c20"><h2 class="ch-title"><span class="ch-no">20</span>第 19 章 · 学习路线（12 周详细）</h2><div class="ch-body">
+<table class="mat">
+<tr><th>周次</th><th>目标</th><th>产出</th></tr>
+<tr><td>1</td><td>分清 PolarDB vs X；认拓扑</td><td>手绘架构图</td></tr>
+<tr><td>2</td><td>读写分离与粘主</td><td>接口分级表</td></tr>
+<tr><td>3</td><td>会话/锁/慢 SQL</td><td>排障笔记</td></tr>
+<tr><td>4</td><td>长事务与 Java 映射</td><td>案例 2 个</td></tr>
+<tr><td>5</td><td>HA 理论+看切换记录</td><td>切换检查单</td></tr>
+<tr><td>6</td><td>备份恢复演练参与</td><td>演练复盘</td></tr>
+<tr><td>7</td><td>空间与连接治理</td><td>巡检清单</td></tr>
+<tr><td>8</td><td>PolarDB-X 组件</td><td>CN/DN 图</td></tr>
+<tr><td>9</td><td>分片键评审</td><td>评审意见模板</td></tr>
+<tr><td>10</td><td>跨片事务与幂等</td><td>风险清单</td></tr>
+<tr><td>11</td><td>DDL/扩缩容观摩</td><td>变更检查单</td></tr>
+<tr><td>12</td><td>三库对照+综合复盘</td><td>个人手册 v1</td></tr>
+</table>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c20">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c20" data-nid="c20" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c21"><h2 class="ch-title"><span class="ch-no">21</span>第 20 章 · 自测题（手册级）</h2><div class="ch-body">
+<ol>
+<li>用大白话讲清 PolarDB 与传统主备差异，并画图。</li>
+<li>写后读旧的根因与三类接口策略。</li>
+<li>长事务的三类 Java 根因与库侧表现。</li>
+<li>HA 切换步骤与应用半成功防护。</li>
+<li>何时上 PolarDB-X？何时不上？</li>
+<li>分片键选时间字段的风险链。</li>
+<li>跨片事务超时的正确处置顺序。</li>
+<li>全局索引的代价是什么？</li>
+<li>给出你的日巡检 10 项。</li>
+<li>用五步法复盘「RO 被报表打满」。</li>
+<li>对照写出同一锁等待在 Polar/高斯/TDSQL 的查法差异（可后补）。</li>
+<li>设计一个支付结果页的读写策略。</li>
+</ol>
+<p>请在下方笔记作答；导出 PDF 时可一并打印。</p>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c21">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c21" data-nid="c21" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c22"><h2 class="ch-title"><span class="ch-no">22</span>附录 A · 小词典</h2><div class="ch-body">
+<table class="mat">
+<tr><th>词</th><th>大白话</th></tr>
+<tr><td>计算节点</td><td>干活柜台</td></tr>
+<tr><td>共享存储</td><td>共用金库</td></tr>
+<tr><td>RO</td><td>只读柜台</td></tr>
+<tr><td>代理</td><td>大堂分流</td></tr>
+<tr><td>水位</td><td>落后多少</td></tr>
+<tr><td>分片</td><td>大账本拆柜</td></tr>
+<tr><td>CN/DN</td><td>大厅/分柜</td></tr>
+<tr><td>全局事务</td><td>多柜一起成或一起回滚</td></tr>
+<tr><td>粘主</td><td>关键读回主柜台</td></tr>
+<tr><td>半成功</td><td>一边成一边不确定</td></tr>
+</table>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c22">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c22" data-nid="c22" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
+</section><section class="card" id="c23"><h2 class="ch-title"><span class="ch-no">23</span>附录 B · 常见误区</h2><div class="ch-body">
+<table class="mat">
+<tr><th>误区</th><th>纠正</th></tr>
+<tr><td>有 RO 就强一致</td><td>关键读要策略</td></tr>
+<tr><td>分布式一定更快</td><td>跨片可能更慢</td></tr>
+<tr><td>云库不用管备份</td><td>要管保留与演练</td></tr>
+<tr><td>运维只会点控制台</td><td>要懂链路与资金半成功</td></tr>
+<tr><td>切换成功=业务正确</td><td>还要对账与幂等</td></tr>
+<tr><td>Java 转库没用</td><td>复合追根因很值钱</td></tr>
+</table>
+</div>
+  <div class="section-label label-note">我的笔记（富文本，自动保存）</div>
+  <div class="note-toolbar" data-for="note-c23">
+    <button type="button" data-cmd="bold">加粗</button>
+    <button type="button" data-cmd="highlight">高亮</button>
+    <button type="button" data-cmd="clear">清除格式</button>
+    <button type="button" data-cmd="save">保存笔记</button>
+  </div>
+  <div class="note-editor" id="note-c23" data-nid="c23" contenteditable="true"
+       data-placeholder="手册笔记：原理 / 现场映射 / 命令与告警 / 疑问…"></div>
 </section>
-<p class="foot">PolarDB 完整学习册 · 暖色笔记 · localStorage 自动保存</p>
+  <p class="foot">PolarDB 运维架构手册详细版 · 暖色笔记 · localStorage 自动保存</p>
 </div>
 <script>
 (function(){
-const NS='polardb-study-notes-v2';
-const load=()=>{try{return JSON.parse(localStorage.getItem(NS)||'{}');}catch(e){return {};}};
-const saveAll=o=>localStorage.setItem(NS,JSON.stringify(o));
-const saveOne=(id,html)=>{const a=load();a[id]=html;a._updatedAt=new Date().toISOString();saveAll(a);};
-const all=load();
-document.querySelectorAll('.note-editor').forEach(ed=>{const id=ed.dataset.nid;if(all[id])ed.innerHTML=all[id];ed.addEventListener('input',()=>saveOne(id,ed.innerHTML));});
-document.querySelectorAll('.note-toolbar').forEach(bar=>{
- bar.addEventListener('click',ev=>{
-  const btn=ev.target.closest('button');if(!btn)return;
-  const ed=document.getElementById(bar.dataset.for);if(!ed)return;ed.focus();
-  const c=btn.dataset.cmd;
-  if(c==='bold')document.execCommand('bold');
-  else if(c==='highlight'){document.execCommand('hiliteColor',false,'#fde68a');try{document.execCommand('backColor',false,'#fde68a');}catch(e){}}
-  else if(c==='clear')document.execCommand('removeFormat');
-  else if(c==='save'){saveOne(ed.dataset.nid,ed.innerHTML);btn.textContent='已保存';setTimeout(()=>btn.textContent='保存笔记',800);}
- });
-});
-document.getElementById('btn-export-pdf').onclick=()=>window.print();
-document.getElementById('btn-export-json').onclick=()=>{
- const data={app:'polardb-study',exportedAt:new Date().toISOString(),notes:load()};
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
- a.download='PolarDB笔记备份-'+new Date().toISOString().slice(0,10)+'.json';a.click();
-};
-const fi=document.getElementById('import-file');
-document.getElementById('btn-import-json').onclick=()=>fi.click();
-fi.onchange=async()=>{
- const f=fi.files&&fi.files[0];if(!f)return;
- try{const data=JSON.parse(await f.text());const notes=data.notes||data;saveAll(notes);
- document.querySelectorAll('.note-editor').forEach(ed=>{if(notes[ed.dataset.nid])ed.innerHTML=notes[ed.dataset.nid];});alert('导入成功');}
- catch(err){alert('导入失败：'+err.message);} fi.value='';
-};
+  const NS='polardb-handbook-notes-v1';
+  const load=()=>{try{return JSON.parse(localStorage.getItem(NS)||'{}');}catch(e){return {};}};
+  const saveAll=o=>localStorage.setItem(NS,JSON.stringify(o));
+  const saveOne=(id,html)=>{const a=load();a[id]=html;a._updatedAt=new Date().toISOString();saveAll(a);};
+  const all=load();
+  document.querySelectorAll('.note-editor').forEach(ed=>{
+    const id=ed.dataset.nid; if(all[id]) ed.innerHTML=all[id];
+    ed.addEventListener('input',()=>saveOne(id,ed.innerHTML));
+  });
+  document.querySelectorAll('.note-toolbar').forEach(bar=>{
+    bar.addEventListener('click',ev=>{
+      const btn=ev.target.closest('button'); if(!btn) return;
+      const ed=document.getElementById(bar.dataset.for); if(!ed) return; ed.focus();
+      const c=btn.dataset.cmd;
+      if(c==='bold') document.execCommand('bold');
+      else if(c==='highlight'){document.execCommand('hiliteColor',false,'#fde68a');try{document.execCommand('backColor',false,'#fde68a');}catch(e){}}
+      else if(c==='clear') document.execCommand('removeFormat');
+      else if(c==='save'){saveOne(ed.dataset.nid,ed.innerHTML);btn.textContent='已保存';setTimeout(()=>btn.textContent='保存笔记',800);}
+    });
+  });
+  document.getElementById('btn-export-pdf').onclick=()=>window.print();
+  document.getElementById('btn-export-json').onclick=()=>{
+    const data={app:'polardb-handbook',exportedAt:new Date().toISOString(),notes:load()};
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+    a.download='PolarDB手册笔记-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  };
+  const fi=document.getElementById('import-file');
+  document.getElementById('btn-import-json').onclick=()=>fi.click();
+  fi.onchange=async()=>{
+    const f=fi.files&&fi.files[0]; if(!f) return;
+    try{
+      const data=JSON.parse(await f.text()); const notes=data.notes||data; saveAll(notes);
+      document.querySelectorAll('.note-editor').forEach(ed=>{if(notes[ed.dataset.nid]) ed.innerHTML=notes[ed.dataset.nid];});
+      alert('导入成功');
+    }catch(err){alert('导入失败：'+err.message);}
+    fi.value='';
+  };
 })();
-</script></body></html>
+</script>
+</body>
+</html>
